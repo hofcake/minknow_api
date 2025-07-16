@@ -14,6 +14,12 @@ __all__ = [
     "GetBasecallClientResponse",
     "GetBasecallServerState",
     "GetBasecallServerResponse",
+    "DisconnectFlowCellRequest",
+    "DisconnectFlowCellResponse",
+    "ConnectFlowCellRequest",
+    "ConnectFlowCellResponse",
+    "SimulateFrameLossRequest",
+    "SimulateFrameLossResponse",
 ]
 
 def run_with_retry(method, message, timeout, unwraps, full_name):
@@ -113,6 +119,152 @@ class DebugService(object):
             raise ArgumentError("Unexpected keyword arguments to get_basecaller_server_state: '{}'".format(", ".join(unused_args)))
 
         return run_with_retry(self._stub.get_basecaller_server_state,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.debug.DebugService")
+    def disconnect_flow_cell(self, _message=None, _timeout=None, **kwargs):
+        """Disconnect flow cell at a position
+        Preconditions:
+        - the position is a simulated position
+        The call is ignored if the flow cell at that position is already disconnected
+
+        
+
+        Args:
+            _message (minknow_api.debug_pb2.DisconnectFlowCellRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+
+        Returns:
+            minknow_api.debug_pb2.DisconnectFlowCellResponse
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.disconnect_flow_cell,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.debug.DebugService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = DisconnectFlowCellRequest()
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to disconnect_flow_cell: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.disconnect_flow_cell,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.debug.DebugService")
+    def connect_flow_cell(self, _message=None, _timeout=None, **kwargs):
+        """Connect flow cell at a position
+        Preconditions:
+        - the position is a simulated position
+        The call is ignored if the position already has a flow cell connected
+
+        
+
+        Args:
+            _message (minknow_api.debug_pb2.ConnectFlowCellRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+
+        Returns:
+            minknow_api.debug_pb2.ConnectFlowCellResponse
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.connect_flow_cell,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.debug.DebugService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = ConnectFlowCellRequest()
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to connect_flow_cell: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.connect_flow_cell,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.debug.DebugService")
+    def simulate_frame_loss(self, _message=None, _timeout=None, **kwargs):
+        """Simulate frame loss for a specified amount of time
+        The request will only trigger the frame loss once during
+        the next initiated acquisition.
+        Preconditions:
+        - The position must be a simulated position
+        - An acquisition must not already be in progress
+
+        
+
+        Args:
+            _message (minknow_api.debug_pb2.SimulateFrameLossRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+            frame_loss_duration (google.protobuf.duration_pb2.Duration, optional): The duration for which the frame loss will occur.
+            start_frame (int, optional): The frame index from which the frame loss will begin
+
+                For simulated PromethIONs this equates to the frame index within a section
+            start_section (int, optional): Optional section index from which the frame loss will begin
+
+                For simulated PromethIONs a section equates to a completed scatterlist
+            repeats (int, optional): Optional number of times to repeat the failed transfers
+
+                This will reset the frame loss on starting a new acquisition or
+                resuming acquisition on an existing signal reader.
+
+        Returns:
+            minknow_api.debug_pb2.SimulateFrameLossResponse
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.simulate_frame_loss,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.debug.DebugService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = SimulateFrameLossRequest()
+
+        if "frame_loss_duration" in kwargs:
+            unused_args.remove("frame_loss_duration")
+            _message.frame_loss_duration.CopyFrom(kwargs['frame_loss_duration'])
+
+        if "start_frame" in kwargs:
+            unused_args.remove("start_frame")
+            _message.start_frame = kwargs['start_frame']
+
+        if "start_section" in kwargs:
+            unused_args.remove("start_section")
+            _message.start_section = kwargs['start_section']
+
+        if "repeats" in kwargs:
+            unused_args.remove("repeats")
+            _message.repeats = kwargs['repeats']
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to simulate_frame_loss: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.simulate_frame_loss,
                               _message, _timeout,
                               [],
                               "minknow_api.debug.DebugService")

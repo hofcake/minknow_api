@@ -732,6 +732,8 @@ message AcquisitionConfigSummary {
     bool fastq_reads_enabled = 5;
     // Determine if pod5 reads were enabled for the run.
     bool pod5_reads_enabled = 22;
+    // Determine if bam reads were enabled for the run
+    bool bam_reads_enabled = 26;
 
     // This field has been removed
     // Since 5.8

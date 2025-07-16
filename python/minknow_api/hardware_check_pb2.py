@@ -65,6 +65,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_GENERATEHARDWARECHECKREPORTRESPONSE']._serialized_end=1608
   _globals['_HARDWARECHECKSERVICE']._serialized_start=1969
   _globals['_HARDWARECHECKSERVICE']._serialized_end=2775
+GenerateHardwareCheckReportRequest.__doc__ = """Attributes:
+    hardware_check_id:
+        The ID of the hardware check to generate a report for.
+"""
 StreamHardwareCheckResultsResponse.__doc__ = """Attributes:
     hardware_check_result:
         Returns the hardware check results.  If no ID is provided,
@@ -76,6 +80,25 @@ StreamHardwareCheckResultsResponse.__doc__ = """Attributes:
         and end. If an ID is provided for the current hardware check,
         it will stay connected for new updates and end when the check
         is completed.  Each result will be returned individually.
+"""
+StartHardwareCheckRequest.__doc__ = """Attributes:
+    position_ids:
+        A list of position IDs to start a hardware check on e.g.
+        `['X1', X2', 'X5']`.
+"""
+PositionCheckResult.__doc__ = """Each position result
+
+Attributes:
+    position_id:
+        The ID of the position that performed the hardware check.
+    device_type:
+        The type of the device the hardware check is running on.
+    hardware_check_result:
+        The position hardware check result This is the
+        HardwareCheckResult message from the protocol
+    adapter_id:
+        The unique identifier of an attached flongle adapter. This
+        should be same as the value printed onto the adapter casing.
 """
 StreamHardwareCheckResultsRequest.__doc__ = """Attributes:
     hardware_check_id:
@@ -108,12 +131,48 @@ StreamHardwareCheckResultsRequest.__doc__ = """Attributes:
         stream)  If `count` is `0` (the default) then all matching
         records will be returned
 """
+HardwareCheckResult.__doc__ = """The data sent to the UI
+
+Attributes:
+    failure_reason:
+        `failure_reason` is guaranteed to be:  - `NoError` if `status`
+        is NOT `Failed`  - NOT `NoError` if `status` is `Failed`
+    calibration_results:
+        Results data for calibration test
+    temperature_results:
+        Results data for temperature test
+    hardware_check_id:
+        The ID of this hardware check result.
+    start_time:
+        The time (UTC) when the hardware check was started.
+    end_time:
+        The time (UTC) when the hardware check completed.  Unset if
+        the check is still running.
+    hardware_check_script_data:
+        The data from the hardware check script
+    state:
+        Indicates the current state of the hardware check run.
+"""
 GenerateHardwareCheckReportResponse.__doc__ = """Attributes:
     hardware_check_id:
         The ID of the hardware check the report is for.
     report_data:
         A section of the hardware check report data (note the api to
         return this data may stream back several sections).
+"""
+StopHardwareCheckRequest.__doc__ = """Attributes:
+    hardware_check_id:
+        The unique ID for a hardware check.
+"""
+UpdateHardwareCheckResultsRequest.__doc__ = """Attributes:
+    hardware_check_id:
+        The unique ID for a hardware check.
+    hardware_check_script_data:
+        The data from the hardware check script
+"""
+StartHardwareCheckResponse.__doc__ = """Attributes:
+    hardware_check_id:
+        The unique ID for the newly created hardware check.
 """
 HardwareCheckScriptData.__doc__ = """The data received from the hardware check script
 
@@ -138,64 +197,5 @@ Attributes:
         protocol_run_ids that have been started by the hardware check
         If any protocol listed here is still running when the hardware
         check finishes, that protocol will be stopped.
-"""
-PositionCheckResult.__doc__ = """Each position result
-
-Attributes:
-    position_id:
-        The ID of the position that performed the hardware check.
-    device_type:
-        The type of the device the hardware check is running on.
-    hardware_check_result:
-        The position hardware check result This is the
-        HardwareCheckResult message from the protocol
-    adapter_id:
-        The unique identifier of an attached flongle adapter. This
-        should be same as the value printed onto the adapter casing.
-"""
-StartHardwareCheckResponse.__doc__ = """Attributes:
-    hardware_check_id:
-        The unique ID for the newly created hardware check.
-"""
-GenerateHardwareCheckReportRequest.__doc__ = """Attributes:
-    hardware_check_id:
-        The ID of the hardware check to generate a report for.
-"""
-HardwareCheckResult.__doc__ = """The data sent to the UI
-
-Attributes:
-    failure_reason:
-        `failure_reason` is guaranteed to be:  - `NoError` if `status`
-        is NOT `Failed`  - NOT `NoError` if `status` is `Failed`
-    calibration_results:
-        Results data for calibration test
-    temperature_results:
-        Results data for temperature test
-    hardware_check_id:
-        The ID of this hardware check result.
-    start_time:
-        The time (UTC) when the hardware check was started.
-    end_time:
-        The time (UTC) when the hardware check completed.  Unset if
-        the check is still running.
-    hardware_check_script_data:
-        The data from the hardware check script
-    state:
-        Indicates the current state of the hardware check run.
-"""
-StartHardwareCheckRequest.__doc__ = """Attributes:
-    position_ids:
-        A list of position IDs to start a hardware check on e.g.
-        `['X1', X2', 'X5']`.
-"""
-StopHardwareCheckRequest.__doc__ = """Attributes:
-    hardware_check_id:
-        The unique ID for a hardware check.
-"""
-UpdateHardwareCheckResultsRequest.__doc__ = """Attributes:
-    hardware_check_id:
-        The unique ID for a hardware check.
-    hardware_check_script_data:
-        The data from the hardware check script
 """
 # @@protoc_insertion_point(module_scope)

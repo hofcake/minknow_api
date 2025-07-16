@@ -66,6 +66,11 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_GETPRESETRESPONSE']._serialized_end=3857
   _globals['_PRESETSSERVICE']._serialized_start=3860
   _globals['_PRESETSSERVICE']._serialized_end=4717
+StorePresetRequest.__doc__ = """Store preset Request  Stores a preset with preset_id.  If preset_id is
+left blank, then a random UUID is generated and used instead. If the
+given preset_id already exists, then the request will fail with grpc
+code ALREADY_EXISTS. However, if the overwrite parameter is set to
+true, then any existing preset is overwritten without error."""
 GetPresetResponse.__doc__ = """Attributes:
     preset_type:
         The preset_type should never resolve to preset id, But as this
@@ -82,9 +87,4 @@ PresetMeta.__doc__ = """Attributes:
         The last time the preset was used in a protocol. Used to
         chronologically order the preset list.
 """
-StorePresetRequest.__doc__ = """Store preset Request  Stores a preset with preset_id.  If preset_id is
-left blank, then a random UUID is generated and used instead. If the
-given preset_id already exists, then the request will fail with grpc
-code ALREADY_EXISTS. However, if the overwrite parameter is set to
-true, then any existing preset is overwritten without error."""
 # @@protoc_insertion_point(module_scope)

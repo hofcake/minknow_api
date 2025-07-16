@@ -6,6 +6,7 @@ option java_package = "com.nanoporetech.minknow_api.v2";
 option objc_class_prefix = "MKAPI";
 option go_package = "github.com/nanoporetech/minknow_api/go/gen/v2/protocol";
 
+import "minknow_api/acquisition.proto";
 import "minknow_api/protocol.proto";
 import "minknow_api/manager.proto";
 import "util/status.proto";
@@ -60,6 +61,38 @@ service ProtocolsService
     rpc list_protocol_runs (minknow_api.protocol.ListProtocolRunsRequest) returns (minknow_api.protocol.ListProtocolRunsResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
+
+    // Sends out a 'clear history data' request to all flow cells.
+    //
+    // History data includes protocol protocol info, acquisition info and statistics.
+    //
+    // Also clears any persistence data that has been written to disk for those protocols which meet the criteria -- this
+    // data will not be available after a restart.
+    //
+    // Does NOT clear experiment results (fast5, fastq, sequencing_summary, etc)
+    //
+    // Since 6.5
+    //
+    rpc clear_protocols_history_data(minknow_api.protocol.ClearProtocolHistoryDataRequest) returns (minknow_api.protocol.ClearProtocolHistoryDataResponse) {}
+
+    // Generate a run report and return the report data.
+    //
+    // If the protocol selected for report generation is already complete the report is a completed report, otherwise
+    // the report will be from the in progress protocol.
+    //
+    // Since 6.5
+    rpc generate_run_report(minknow_api.protocol.GenerateRunReportRequest) returns (stream minknow_api.protocol.GenerateRunReportResponse) {}
+
+    // Gets information about a acquisition run.
+    //
+    // If no run ID is provided, information about the most recently started acquisition run is
+    // provided.
+    //
+    // Since 6.5
+    rpc get_acquisition_info (minknow_api.acquisition.GetAcquisitionRunInfoRequest) returns (minknow_api.acquisition.AcquisitionRunInfo) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
 }
 
 message BeginProtocolsRequest

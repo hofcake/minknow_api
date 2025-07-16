@@ -19,6 +19,8 @@ __all__ = [
     "SignalNegative",
     "DataServiceUnblockMuxChange",
     "AnalysisConfigChange",
+    "DeviceDataError",
+    "ApiRequest",
 ]
 
 def run_with_retry(method, message, timeout, unwraps, full_name):

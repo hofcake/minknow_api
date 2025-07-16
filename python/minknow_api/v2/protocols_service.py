@@ -280,3 +280,155 @@ class ProtocolsService(object):
                               _message, _timeout,
                               [],
                               "minknow_api.v2.protocol.ProtocolsService")
+    def clear_protocols_history_data(self, _message=None, _timeout=None, **kwargs):
+        """Sends out a 'clear history data' request to all flow cells.
+
+        History data includes protocol protocol info, acquisition info and statistics.
+
+        Also clears any persistence data that has been written to disk for those protocols which meet the criteria -- this
+        data will not be available after a restart.
+
+        Does NOT clear experiment results (fast5, fastq, sequencing_summary, etc)
+
+        Since 6.5
+
+        
+
+        Args:
+            _message (minknow_api.protocol_pb2.ClearProtocolHistoryDataRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+            protocol_ids (str, optional): 
+
+        Returns:
+            minknow_api.protocol_pb2.ClearProtocolHistoryDataResponse
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.clear_protocols_history_data,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.v2.protocol.ProtocolsService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = minknow_api.protocol_pb2.ClearProtocolHistoryDataRequest()
+
+        if "protocol_ids" in kwargs:
+            unused_args.remove("protocol_ids")
+            _message.protocol_ids.extend(kwargs['protocol_ids'])
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to clear_protocols_history_data: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.clear_protocols_history_data,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.v2.protocol.ProtocolsService")
+    def generate_run_report(self, _message=None, _timeout=None, **kwargs):
+        """Generate a run report and return the report data.
+
+        If the protocol selected for report generation is already complete the report is a completed report, otherwise
+        the report will be from the in progress protocol.
+
+        Since 6.5
+
+        
+
+        Args:
+            _message (minknow_api.protocol_pb2.GenerateRunReportRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+                Note that this is the time until the call ends, not the time between returned
+                messages.
+            protocol_run_id (str, optional): The protocol_run_id to generate a report for.
+            include_input_data (bool, optional): Optionally return the input data used to generate the report. This input data is
+                represented as the data seen in report_data.proto
+
+        Returns:
+            iter of minknow_api.protocol_pb2.GenerateRunReportResponse
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.generate_run_report,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.v2.protocol.ProtocolsService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = minknow_api.protocol_pb2.GenerateRunReportRequest()
+
+        if "protocol_run_id" in kwargs:
+            unused_args.remove("protocol_run_id")
+            _message.protocol_run_id = kwargs['protocol_run_id']
+
+        if "include_input_data" in kwargs:
+            unused_args.remove("include_input_data")
+            _message.include_input_data = kwargs['include_input_data']
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to generate_run_report: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.generate_run_report,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.v2.protocol.ProtocolsService")
+    def get_acquisition_info(self, _message=None, _timeout=None, **kwargs):
+        """Gets information about a acquisition run.
+
+        If no run ID is provided, information about the most recently started acquisition run is
+        provided.
+
+        Since 6.5
+
+        This RPC has no side effects. Calling it will have no effect on the state of the
+        system. It is safe to call repeatedly, or to retry on failure, although there is no
+        guarantee it will return the same information each time.
+
+        Args:
+            _message (minknow_api.acquisition_pb2.GetAcquisitionRunInfoRequest, optional): The message to send.
+                This can be passed instead of the keyword arguments.
+            _timeout (float, optional): The call will be cancelled after this number of seconds
+                if it has not been completed.
+            run_id (str, optional): The acquisition period to get information about.
+
+        Returns:
+            minknow_api.acquisition_pb2.AcquisitionRunInfo
+
+        Note that the returned messages are actually wrapped in a type that collapses
+        submessages for fields marked with ``[rpc_unwrap]``.
+        """
+        if _message is not None:
+            if isinstance(_message, MessageWrapper):
+                _message = _message._message
+            return run_with_retry(self._stub.get_acquisition_info,
+                                  _message, _timeout,
+                                  [],
+                                  "minknow_api.v2.protocol.ProtocolsService")
+
+        unused_args = set(kwargs.keys())
+
+        _message = minknow_api.acquisition_pb2.GetAcquisitionRunInfoRequest()
+
+        if "run_id" in kwargs:
+            unused_args.remove("run_id")
+            _message.run_id = kwargs['run_id']
+
+        if len(unused_args) > 0:
+            raise ArgumentError("Unexpected keyword arguments to get_acquisition_info: '{}'".format(", ".join(unused_args)))
+
+        return run_with_retry(self._stub.get_acquisition_info,
+                              _message, _timeout,
+                              [],
+                              "minknow_api.v2.protocol.ProtocolsService")

@@ -122,6 +122,26 @@ class RunUntilService(object):
          Criterion is met if the number of basecalled bases which pass filtering is greater than or
          equal to the specified value.
 
+    `coverage` (float)
+         The number of times a given reference genome is sequenced
+         Criterion will never be met if basecalling is not enabled or a reference is not supplied
+         Updates will not be supplied if basecalling is not enabled or a reference is not supplied
+         Criterion is met if the coverage amount is greater than or equal than the specified value
+
+    `barcode_coverage` (float)
+         The number of times a given reference genome is sequenced and has also been identified to have an attached barcode
+         Criterion will never be met if basecalling is not enabled, a reference is not supplied, barcoding is not enabled, or the samples have no attached barcode
+         Updates will not be supplied if basecalling is not enabled or a reference is not supplied, barcoding is not enabled, or the samples have no attached barcode
+         Criterion is met if the coverage amount is greater than or equal than the specified value
+
+    `bed_coverage` (float)
+         The same as `coverage`, with the addition that the bases have to be associated with a BED region
+         Criterion will also never be met if a BED file is not supplied
+
+    `bed_barcode_coverage` (float)
+         The same as `barcode_coverage`, with the addition that the bases have to be associated with a BED region
+         Criterion will also never be met if a BED file is not supplied
+
 
     Additional Run-Until Criteria
     -----------------------------

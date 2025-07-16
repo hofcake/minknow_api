@@ -124,23 +124,6 @@ ChangePixelBlockSettingsRequest.__doc__ = """Attributes:
         If supplied, contains settings applied to every block before
         then applying any specific settings in the per block settings.
 """
-StreamTemperatureRequest.__doc__ = """Attributes:
-    period_seconds:
-        How often temperature updates should be sent Defaults to a
-        period of 1 second, if not specified, or set to 0
-    acquisition_run_id:
-        The acquisition id of the experiment.
-    data_selection:
-        The desired data selection.  The units for all values are
-        `seconds since the start of the experiment`.
-"""
-ChangePixelSettingsRequest.__doc__ = """Attributes:
-    pixels:
-        1 based map of up to 3000 different pixel settings
-    pixel_default:
-        If supplied, contains settings applied to every pixel before
-        then applying any specific settings in the per pixel settings.
-"""
 GetTemperatureResponse.__doc__ = """Attributes:
     target_temperature:
         Return the temperature target the device is aiming to reach.
@@ -155,106 +138,19 @@ GetTemperatureResponse.__doc__ = """Attributes:
         Temperature measured at each sensor in the ASIC, there are 12
         sensors, one sensor per pixel-block
 """
-PixelBlockSettings.__doc__ = """Attributes:
-    regen_current_voltage_clamp:
-        Voltage clamp for regeneration circuit (in millivolts)  The
-        voltage in the regeneration circuit is clamped under this
-        value, whilst applying the current specified in each pixel's
-        settings.  The acceptable input range is -1000..1000
-        (inclusive)
-    unblock_voltage:
-        The unblock voltage to apply when a pixel is unblocking.  The
-        acceptable input range is -1000..1000 (inclusive)
-"""
-TimingEnginePeriods.__doc__ = """ Timing-engine periods are specified in 5ns units. Some of the timing
-mechanism can only achieve 10ns accuracy, so even numbers are
-preferred.  Note: There is a timing feature in the ASIC that requires
-the sum of the RST1 and DATA periods to be a multiple of 16
-
-Attributes:
-    RST1:
-        Reset1 phase  Note: Commands are written to the ASIC during
-        this period, to allow sufficient time to write the commands,
-        this should never be less than 1.2us or 240.
-    RST1_CDS1:
-        Reset1 to CDS1 transition
-    CDS1:
-        CDS1 phase (Correlated Double Sampling) sample-point 1
-    CDS1_DATA:
-        CDS1 to DATA transition
-    DATA:
-        DATA transfer phase  NOTE: Setting this value has no effect,
-        MinKNOW will choose a value for DATA itself to achieve the
-        required frame-rate. Reading it will return the chosen DATA
-        period.
-    DATA_RST2:
-        DATA transfer to Reset2 transition. MinKNOW may increase this
-        value by small amounts so that when changing the DATA period,
-        the sum of the RST1 and DATA periods is a multiple of 16 and
-        the frame-rate and integration-period are maintained.
-    RST2:
-        Reset2
-    RST2_CDS2:
-        Reset2 to CDS2 transition
-    CDS2:
-        CDS2 Phase (sample-point 2)
-    CDS2_SH:
-        CDS2 to SH transition
-    SH:
-        SH phase (Sample and Hold)
-    SH_RST1:
-        SH to Reset1 transition
-    use_default_values:
-        If written true, other fields will be ignored and the hardware
-        will use default timings. When read will return true if
-        previously set true, it will not tell you if the timing
-        periods you previously entered are the same as the default
-        values.
-    states:
-        Zero index based map [0-15] of up to 16 timing engine states
-"""
 DeviceSettings.__doc__ = """Attributes:
-    sampling_frequency:
-        The number of measurements to take each second.  Possible
-        values are between 1000, and 10000. If the value is outside of
-        this range, it will be clamped within it  This value cannot be
-        changed during acquisition.
-    ramp_voltage:
-        The value to apply as the ramp voltage (in millivolts)  Valid
-        values are in the range -1250mv..1250mv
-    bias_voltage_setting:
-        Settings controlling the device bias voltage
-    bias_voltage:
-        The value to apply as the bias voltage (in millivolts)  Valid
-        values are in the range [-Vref..Vref]mv INVALID_ARGUMENT will
-        be returned if outside this range
-    bias_voltage_waveform:
-        The wavetable settings
-    saturation_control_enabled:
-        Enables saturation control on the device
-    fast_calibration_enabled:
-        Enable use of the fast calibration mode across the device
-        DEPRECATED since 5.5. This will be removed in a future
-        release.
-    temperature_target:
-        If the device is capable (see
-        device.get_device_info().temperature_controllable) then this
-        sets the target temperature to keep the flow-cell at.  This
-        value must be between the limits specified in the application
-        config, see: min_user_setpoint_temperature_celsius and
-        max_user_setpoint_temperature_celsius INVALID_ARGUMENT will be
-        returned if outside these limits
-    timings:
-        If specified, the device will adopt these timings to set how
-        long is spent at various stages of the sampling process. The
-        message includes a way of returning to default timings.
-        FAILED_PRECONDITION will be returned if attempting to change
-        during acquisition
     sample_rate:
         The number of measurements to take each second.  Possible
         values are between 1000, and 5000. If the value is outside of
         this range, it will be clamped within it  FAILED_PRECONDITION
         will be returned if attempting to change during acquisition
+    temperature_target:
+        If the device is capable (see
+        device.get_device_info().temperature_controllable) then this
+        sets the minimum and maximum temperatures of the flow-cell.
+        These values must be between the limits specified in the
+        application config, see: min_user_setpoint_temperature_celsius
+        and max_user_setpoint_temperature_celsius
     reference_voltage:
         The reference voltage Vref  This value must be within the
         range of [700..1100](mV) and will be rounded down to the
@@ -288,6 +184,13 @@ DeviceSettings.__doc__ = """Attributes:
         900mV this gives the regen level a range of [0..840]mV
         INVALID_ARGUMENT will be returned if outside the acceptable
         range
+    bias_voltage_setting:
+        Settings controlling the device bias voltage
+    bias_voltage:
+        The value to apply as the bias voltage (in millivolts)  Valid
+        values are in the range -1250mv..1250mv
+    bias_voltage_waveform:
+        The waveform settings
     int_capacitor:
         Integration capacitor used for controlling the Gain This size
         of the capacitance used is based on the provided setting with
@@ -300,6 +203,11 @@ DeviceSettings.__doc__ = """Attributes:
         Low pass filter time constant This modifies the anti-alias
         resistor to produce a specific time constant for the low pass
         filter.
+    timings:
+        If specified, the device will adopt these timings to set how
+        long is spent at various stages of the current digitisation
+        processes. The message includes a way of returning to default
+        timings.  This value cannot be changed during acquisition
     power_save_active:
         Enable ASIC power save.  Setting to active will save power,
         but doing so will allow the ASIC to cool down, and it will
@@ -308,6 +216,100 @@ DeviceSettings.__doc__ = """Attributes:
     overload_protection:
         Settings for the hardware based saturation/overload protection
         (spike suppression)
+    sampling_frequency:
+        The number of measurements to take each second.  Possible
+        values are between 1000, and 10000. If the value is outside of
+        this range, it will be clamped within it  This value cannot be
+        changed during acquisition.
+    ramp_voltage:
+        The value to apply as the ramp voltage (in millivolts)  Valid
+        values are in the range -1250mv..1250mv
+    saturation_control_enabled:
+        Enables saturation control on the device
+    fast_calibration_enabled:
+        Enable use of the fast calibration mode across the device
+        DEPRECATED since 5.5. This will be removed in a future
+        release.
+"""
+GetPixelSettingsResponse.__doc__ = """Attributes:
+    pixels:
+        List of all requested pixel settings, in the order requested.
+"""
+StreamTemperatureRequest.__doc__ = """Attributes:
+    period_seconds:
+        How often temperature updates should be sent Defaults to a
+        period of 1 second, if not specified, or set to 0
+    acquisition_run_id:
+        The acquisition id of the experiment.
+    data_selection:
+        The desired data selection.  The units for all values are
+        `seconds since the start of the experiment`.
+"""
+WaveformSettings.__doc__ = """Attributes:
+    voltages:
+        The waveform data applied to the device (in millivolts)  Must
+        contain 32 values, in order to be a valid waveform.
+    samples_per_entry:
+        The number of samples each wavetable entry will be valid for
+        Valid value must be between [1..31] INVALID_ARGUMENT will be
+        returned if not between these values
+    frequency:
+        The frequency of the applied waveform, in Hz.  Valid values
+        are between 7.8125Hz and 500Hz.
+"""
+ChangePixelSettingsRequest.__doc__ = """Attributes:
+    pixels:
+        1 based map of up to 3000 different pixel settings
+    pixel_default:
+        If supplied, contains settings applied to every pixel before
+        then applying any specific settings in the per pixel settings.
+"""
+TimingEnginePeriods.__doc__ = """ Timing-engine periods are specified in 5ns units. Some of the timing
+mechanism can only achieve 10ns accuracy, so even numbers are
+preferred.  Note: There is a timing feature in the ASIC that requires
+the sum of the RST1 and DATA periods to be a multiple of 16
+
+Attributes:
+    states:
+        Zero index based map [0-15] of up to 16 timing engine states
+    use_default_values:
+        If written true, other fields will be ignored and the hardware
+        will use default timings. When read will return true if
+        previously set true, it will not tell you if the timing
+        periods you previously entered are the same as the default
+        values.
+    RST1:
+        Reset1 phase  Note: Commands are written to the ASIC during
+        this period, to allow sufficient time to write the commands,
+        this should never be less than 1.2us or 240.
+    RST1_CDS1:
+        Reset1 to CDS1 transition
+    CDS1:
+        CDS1 phase (Correlated Double Sampling) sample-point 1
+    CDS1_DATA:
+        CDS1 to DATA transition
+    DATA:
+        DATA transfer phase  NOTE: Setting this value has no effect,
+        MinKNOW will choose a value for DATA itself to achieve the
+        required frame-rate. Reading it will return the chosen DATA
+        period.
+    DATA_RST2:
+        DATA transfer to Reset2 transition. MinKNOW may increase this
+        value by small amounts so that when changing the DATA period,
+        the sum of the RST1 and DATA periods is a multiple of 16 and
+        the frame-rate and integration-period are maintained.
+    RST2:
+        Reset2
+    RST2_CDS2:
+        Reset2 to CDS2 transition
+    CDS2:
+        CDS2 Phase (sample-point 2)
+    CDS2_SH:
+        CDS2 to SH transition
+    SH:
+        SH phase (Sample and Hold)
+    SH_RST1:
+        SH to Reset1 transition
 """
 PixelSettings.InputWell.__doc__ = """Attributes:
     input_well:
@@ -319,6 +321,17 @@ PixelSettings.InputWell.__doc__ = """Attributes:
         are acceptable, as long as the input is not the active adc
         input. For example, { input: 1, regeneration: all } is
         invalid, as an well cannot be both input and regenerated.
+"""
+PixelBlockSettings.__doc__ = """Attributes:
+    regen_current_voltage_clamp:
+        Voltage clamp for regeneration circuit (in millivolts)  The
+        voltage in the regeneration circuit is clamped under this
+        value, whilst applying the current specified in each pixel's
+        settings.  The acceptable input range is -1000..1000
+        (inclusive)
+    unblock_voltage:
+        The unblock voltage to apply when a pixel is unblocking.  The
+        acceptable input range is -1000..1000 (inclusive)
 """
 PixelSettings.__doc__ = """Attributes:
     input:
@@ -355,42 +368,24 @@ PixelSettings.__doc__ = """Attributes:
         amplifier. If it is set to off, no signal readings can be
         made.
 """
-GetPixelBlockSettingsResponse.__doc__ = """Attributes:
-    pixel_blocks:
-        1 based map of different pixel blocks settings, containing 12
-        entries.
-"""
-GetPixelSettingsResponse.__doc__ = """Attributes:
-    pixels:
-        List of all requested pixel settings, in the order requested.
-"""
-ChangeDeviceSettingsResponse.__doc__ = """Attributes:
-    real_sampling_frequency:
-        The sampling frequency actually applied to the hardware, as
-        close as possible to the requested rate.  Note: only returned
-        if sampling rate was set as part of this call.
-    real_sample_rate:
-        The sampling frequency actually applied to the hardware, as
-        close as possible to the requested rate.  Note: only returned
-        if sampling rate was set as part of this call.
-"""
 GetPixelSettingsRequest.__doc__ = """Attributes:
     pixels:
         The channels (one based) to return data for. A sparse map is
         accepted
 """
-WaveformSettings.__doc__ = """Attributes:
-    voltages:
-        The waveform data applied to the device (in millivolts)
-        INVALID_ARGUMENT will be returned if the length of voltages is
-        greater than 254 INVALID_ARGUMENT will be returned if one of
-        the voltages is outside of [-Vref..Vref]mV
-    frequency:
-        The frequency of the applied waveform, in Hz.  Valid values
-        are between 7.8125Hz and 500Hz.
-    samples_per_entry:
-        The number of samples each wavetable entry will be valid for
-        Valid value must be between [1..31] INVALID_ARGUMENT will be
-        returned if not between these values
+GetPixelBlockSettingsResponse.__doc__ = """Attributes:
+    pixel_blocks:
+        1 based map of different pixel blocks settings, containing 12
+        entries.
+"""
+ChangeDeviceSettingsResponse.__doc__ = """Attributes:
+    real_sample_rate:
+        The sampling frequency actually applied to the hardware, as
+        close as possible to the requested rate.  Note: only returned
+        if sampling rate was set as part of this call.
+    real_sampling_frequency:
+        The sampling frequency actually applied to the hardware, as
+        close as possible to the requested rate.  Note: only returned
+        if sampling rate was set as part of this call.
 """
 # @@protoc_insertion_point(module_scope)

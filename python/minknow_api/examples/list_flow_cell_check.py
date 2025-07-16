@@ -1,10 +1,17 @@
 import argparse
 import csv
+import datetime
 
 # minknow_api.manager supplies "Manager" a wrapper around MinKNOW's Manager gRPC API with utilities for
 # querying sequencing positions + offline basecalling tools.
 from minknow_api.manager import Manager
 from minknow_api.protocol_pb2 import FilteringInfo
+
+
+def to_datetime(date_str):
+    if date_str is None:
+        return None
+    return datetime.datetime.strptime(date_str, "%Y-%m-%d")
 
 
 def main():
@@ -26,6 +33,16 @@ def main():
         default=None,
         help="Specify an API token to use, should be returned from the sequencer as a developer API token.",
     )
+    parser.add_argument(
+        "--start-date",
+        default=None,
+        help="Specify a start date to filter results by. Format: YYYY-MM-DD",
+    )
+    parser.add_argument(
+        "--end-date",
+        default=None,
+        help="Specify a end date to filter results by. Format: YYYY-MM-DD",
+    )
 
     parser.add_argument(
         "output_name",
@@ -33,6 +50,9 @@ def main():
     )
 
     args = parser.parse_args()
+
+    start_date_filter = to_datetime(args.start_date)
+    end_date_filter = to_datetime(args.end_date)
 
     # Construct a manager using the host + port provided.
     manager = Manager(
@@ -53,8 +73,16 @@ def main():
         # Dump all pqc protocols run on the position:
         found_position = True
         pos_connection = pos.connect()
+        time_filter = FilteringInfo.TimeFilter()
+        if start_date_filter:
+            time_filter.start_range.FromDatetime(start_date_filter)
+        if end_date_filter:
+            time_filter.end_range.FromDatetime(end_date_filter)
         protocols = pos_connection.protocol.list_protocol_runs(
-            filter_info=FilteringInfo(pqc_filter=FilteringInfo.PlatformQcFilter())
+            filter_info=FilteringInfo(
+                pqc_filter=FilteringInfo.PlatformQcFilter(),
+                experiment_start_time=time_filter,
+            )
         )
         print(f"Searching position {pos.name} {len(protocols.run_ids)} protocols")
         for run_id in protocols.run_ids:

@@ -931,6 +931,36 @@ message ExternalOffload {
     // The `id`s associated with active external data offloads associated with the protocol
     // The offload status can be queried using `mooneye.offload_manager.watch_offloads()``
     repeated string offload_ids = 1;
+
+    // An adapted version of mooneye.OffloadLocation
+    //
+    // Since 6.5
+    message OffloadLocation {
+        // unique id of this offload location (uuid)
+        google.protobuf.StringValue id = 1;
+
+        // name of this offload location
+        string name = 2;
+
+        // Path of directory to offload to
+        // Each worker actually offloads to a unique directory generated at path
+        // which is "OffloadLocation.path / OffloadWorker.id"
+        // path is s3 bucket if LocationType.S3
+        string path = 3;
+
+        // Defines type of offload location
+        enum LocationType {
+            LOCATION_TYPE_LOCAL = 0;
+            LOCATION_TYPE_NETWORK = 1;
+            LOCATION_TYPE_S3 = 2;
+        }
+
+        // location type
+        LocationType location_type = 4;
+    }
+
+    // mooneye offload location information
+    repeated OffloadLocation offload_locations = 2;
 }
 
 // From instance.proto
@@ -1556,8 +1586,11 @@ enum Action {
     // This will only be sent if the can_pause capability has been set to true by a request
     // in the current call to protocol_phase_management().
     //
-    // If the protocol is not pausing or paused, this message should be ignored.
-    // Otherwise, the protocol should immediately respond with a ProtocolPhaseManagementRequest
+    // Since 6.5, this message will not be sent unless the protocol is in PHASE_PAUSED. A
+    // resume request received while the protocol is still pausing will be held back until
+    // the protocol has changed the phase to PHASE_PAUSED.
+    //
+    // The protocol should immediately respond with a ProtocolPhaseManagementRequest
     // that sets the phase appropriated (eg: to PHASE_RESUMING).
     ACTION_RESUME = 2;
     // The protocol should trigger a mux scan.

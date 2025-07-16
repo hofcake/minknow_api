@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+from minknow_api import acquisition_pb2 as minknow__api_dot_acquisition__pb2
 from minknow_api import protocol_pb2 as minknow__api_dot_protocol__pb2
 from minknow_api.v2 import protocols_pb2 as minknow__api_dot_v2_dot_protocols__pb2
 
@@ -39,6 +40,21 @@ class ProtocolsServiceStub(object):
                 '/minknow_api.v2.protocol.ProtocolsService/list_protocol_runs',
                 request_serializer=minknow__api_dot_protocol__pb2.ListProtocolRunsRequest.SerializeToString,
                 response_deserializer=minknow__api_dot_protocol__pb2.ListProtocolRunsResponse.FromString,
+                )
+        self.clear_protocols_history_data = channel.unary_unary(
+                '/minknow_api.v2.protocol.ProtocolsService/clear_protocols_history_data',
+                request_serializer=minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataResponse.FromString,
+                )
+        self.generate_run_report = channel.unary_stream(
+                '/minknow_api.v2.protocol.ProtocolsService/generate_run_report',
+                request_serializer=minknow__api_dot_protocol__pb2.GenerateRunReportRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_protocol__pb2.GenerateRunReportResponse.FromString,
+                )
+        self.get_acquisition_info = channel.unary_unary(
+                '/minknow_api.v2.protocol.ProtocolsService/get_acquisition_info',
+                request_serializer=minknow__api_dot_acquisition__pb2.GetAcquisitionRunInfoRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_acquisition__pb2.AcquisitionRunInfo.FromString,
                 )
 
 
@@ -109,6 +125,47 @@ class ProtocolsServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def clear_protocols_history_data(self, request, context):
+        """Sends out a 'clear history data' request to all flow cells.
+
+        History data includes protocol protocol info, acquisition info and statistics.
+
+        Also clears any persistence data that has been written to disk for those protocols which meet the criteria -- this
+        data will not be available after a restart.
+
+        Does NOT clear experiment results (fast5, fastq, sequencing_summary, etc)
+
+        Since 6.5
+
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def generate_run_report(self, request, context):
+        """Generate a run report and return the report data.
+
+        If the protocol selected for report generation is already complete the report is a completed report, otherwise
+        the report will be from the in progress protocol.
+
+        Since 6.5
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def get_acquisition_info(self, request, context):
+        """Gets information about a acquisition run.
+
+        If no run ID is provided, information about the most recently started acquisition run is
+        provided.
+
+        Since 6.5
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ProtocolsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -136,6 +193,21 @@ def add_ProtocolsServiceServicer_to_server(servicer, server):
                     servicer.list_protocol_runs,
                     request_deserializer=minknow__api_dot_protocol__pb2.ListProtocolRunsRequest.FromString,
                     response_serializer=minknow__api_dot_protocol__pb2.ListProtocolRunsResponse.SerializeToString,
+            ),
+            'clear_protocols_history_data': grpc.unary_unary_rpc_method_handler(
+                    servicer.clear_protocols_history_data,
+                    request_deserializer=minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataRequest.FromString,
+                    response_serializer=minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataResponse.SerializeToString,
+            ),
+            'generate_run_report': grpc.unary_stream_rpc_method_handler(
+                    servicer.generate_run_report,
+                    request_deserializer=minknow__api_dot_protocol__pb2.GenerateRunReportRequest.FromString,
+                    response_serializer=minknow__api_dot_protocol__pb2.GenerateRunReportResponse.SerializeToString,
+            ),
+            'get_acquisition_info': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_acquisition_info,
+                    request_deserializer=minknow__api_dot_acquisition__pb2.GetAcquisitionRunInfoRequest.FromString,
+                    response_serializer=minknow__api_dot_acquisition__pb2.AcquisitionRunInfo.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -229,5 +301,56 @@ class ProtocolsService(object):
         return grpc.experimental.unary_unary(request, target, '/minknow_api.v2.protocol.ProtocolsService/list_protocol_runs',
             minknow__api_dot_protocol__pb2.ListProtocolRunsRequest.SerializeToString,
             minknow__api_dot_protocol__pb2.ListProtocolRunsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def clear_protocols_history_data(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/minknow_api.v2.protocol.ProtocolsService/clear_protocols_history_data',
+            minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataRequest.SerializeToString,
+            minknow__api_dot_protocol__pb2.ClearProtocolHistoryDataResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def generate_run_report(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/minknow_api.v2.protocol.ProtocolsService/generate_run_report',
+            minknow__api_dot_protocol__pb2.GenerateRunReportRequest.SerializeToString,
+            minknow__api_dot_protocol__pb2.GenerateRunReportResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def get_acquisition_info(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/minknow_api.v2.protocol.ProtocolsService/get_acquisition_info',
+            minknow__api_dot_acquisition__pb2.GetAcquisitionRunInfoRequest.SerializeToString,
+            minknow__api_dot_acquisition__pb2.AcquisitionRunInfo.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

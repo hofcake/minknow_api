@@ -24,6 +24,21 @@ class DebugServiceStub(object):
                 request_serializer=minknow__api_dot_debug__pb2.GetBasecallServerState.SerializeToString,
                 response_deserializer=minknow__api_dot_debug__pb2.GetBasecallServerResponse.FromString,
                 )
+        self.disconnect_flow_cell = channel.unary_unary(
+                '/minknow_api.debug.DebugService/disconnect_flow_cell',
+                request_serializer=minknow__api_dot_debug__pb2.DisconnectFlowCellRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_debug__pb2.DisconnectFlowCellResponse.FromString,
+                )
+        self.connect_flow_cell = channel.unary_unary(
+                '/minknow_api.debug.DebugService/connect_flow_cell',
+                request_serializer=minknow__api_dot_debug__pb2.ConnectFlowCellRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_debug__pb2.ConnectFlowCellResponse.FromString,
+                )
+        self.simulate_frame_loss = channel.unary_unary(
+                '/minknow_api.debug.DebugService/simulate_frame_loss',
+                request_serializer=minknow__api_dot_debug__pb2.SimulateFrameLossRequest.SerializeToString,
+                response_deserializer=minknow__api_dot_debug__pb2.SimulateFrameLossResponse.FromString,
+                )
 
 
 class DebugServiceServicer(object):
@@ -43,6 +58,38 @@ class DebugServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def disconnect_flow_cell(self, request, context):
+        """Disconnect flow cell at a position
+        Preconditions:
+        - the position is a simulated position
+        The call is ignored if the flow cell at that position is already disconnected
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def connect_flow_cell(self, request, context):
+        """Connect flow cell at a position
+        Preconditions:
+        - the position is a simulated position
+        The call is ignored if the position already has a flow cell connected
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def simulate_frame_loss(self, request, context):
+        """Simulate frame loss for a specified amount of time
+        The request will only trigger the frame loss once during
+        the next initiated acquisition.
+        Preconditions:
+        - The position must be a simulated position
+        - An acquisition must not already be in progress
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DebugServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -55,6 +102,21 @@ def add_DebugServiceServicer_to_server(servicer, server):
                     servicer.get_basecaller_server_state,
                     request_deserializer=minknow__api_dot_debug__pb2.GetBasecallServerState.FromString,
                     response_serializer=minknow__api_dot_debug__pb2.GetBasecallServerResponse.SerializeToString,
+            ),
+            'disconnect_flow_cell': grpc.unary_unary_rpc_method_handler(
+                    servicer.disconnect_flow_cell,
+                    request_deserializer=minknow__api_dot_debug__pb2.DisconnectFlowCellRequest.FromString,
+                    response_serializer=minknow__api_dot_debug__pb2.DisconnectFlowCellResponse.SerializeToString,
+            ),
+            'connect_flow_cell': grpc.unary_unary_rpc_method_handler(
+                    servicer.connect_flow_cell,
+                    request_deserializer=minknow__api_dot_debug__pb2.ConnectFlowCellRequest.FromString,
+                    response_serializer=minknow__api_dot_debug__pb2.ConnectFlowCellResponse.SerializeToString,
+            ),
+            'simulate_frame_loss': grpc.unary_unary_rpc_method_handler(
+                    servicer.simulate_frame_loss,
+                    request_deserializer=minknow__api_dot_debug__pb2.SimulateFrameLossRequest.FromString,
+                    response_serializer=minknow__api_dot_debug__pb2.SimulateFrameLossResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -97,5 +159,56 @@ class DebugService(object):
         return grpc.experimental.unary_unary(request, target, '/minknow_api.debug.DebugService/get_basecaller_server_state',
             minknow__api_dot_debug__pb2.GetBasecallServerState.SerializeToString,
             minknow__api_dot_debug__pb2.GetBasecallServerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def disconnect_flow_cell(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/minknow_api.debug.DebugService/disconnect_flow_cell',
+            minknow__api_dot_debug__pb2.DisconnectFlowCellRequest.SerializeToString,
+            minknow__api_dot_debug__pb2.DisconnectFlowCellResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def connect_flow_cell(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/minknow_api.debug.DebugService/connect_flow_cell',
+            minknow__api_dot_debug__pb2.ConnectFlowCellRequest.SerializeToString,
+            minknow__api_dot_debug__pb2.ConnectFlowCellResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def simulate_frame_loss(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/minknow_api.debug.DebugService/simulate_frame_loss',
+            minknow__api_dot_debug__pb2.SimulateFrameLossRequest.SerializeToString,
+            minknow__api_dot_debug__pb2.SimulateFrameLossResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

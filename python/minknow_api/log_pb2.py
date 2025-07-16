@@ -62,20 +62,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_COLLECTPINGSRESPONSE']._serialized_end=966
   _globals['_LOGSERVICE']._serialized_start=1269
   _globals['_LOGSERVICE']._serialized_end=1665
-UserMessage.__doc__ = """Attributes:
-    time:
-        Timestamp for when the log message was emitted
-    severity:
-        The severity of the message
-    identifier:
-        A short unique textual identifier for the message Used to
-        identify the message for translation purposes
-    user_message:
-        A long user readable description of the message
-    extra_data:
-        Any extra data associated with the user message, as a map from
-        key to data.
-"""
 SendUserMessageRequest.__doc__ = """Attributes:
     severity:
         The severity of the message to send  note: TRACE messages
@@ -99,14 +85,6 @@ Attributes:
         Should the ping fail to send, the number of days the ping will
         be stored before being cleaned up.
 """
-GetUserMessagesRequest.__doc__ = """Attributes:
-    include_old_messages:
-        If set, any messages which have already been sent to listeners
-        will be sent to the new stream again, before new messages are
-        sent.  If not specified - the default will not send messages
-        that were sent previously.  note: there is a limit on how many
-        messages are recorded for replay.
-"""
 CollectPingsRequest.__doc__ = """Attributes:
     collected_ping_file:
         Any pings that are queued to be sent will be collected into a
@@ -117,5 +95,27 @@ CollectPingsRequest.__doc__ = """Attributes:
     include_previously_colleced_pings:
         Normally previously collected pings are ignored, but by
         setting this they will be included. Defaults to False.
+"""
+UserMessage.__doc__ = """Attributes:
+    time:
+        Timestamp for when the log message was emitted
+    severity:
+        The severity of the message
+    identifier:
+        A short unique textual identifier for the message Used to
+        identify the message for translation purposes
+    user_message:
+        A long user readable description of the message
+    extra_data:
+        Any extra data associated with the user message, as a map from
+        key to data.
+"""
+GetUserMessagesRequest.__doc__ = """Attributes:
+    include_old_messages:
+        If set, any messages which have already been sent to listeners
+        will be sent to the new stream again, before new messages are
+        sent.  If not specified - the default will not send messages
+        that were sent previously.  note: there is a limit on how many
+        messages are recorded for replay.
 """
 # @@protoc_insertion_point(module_scope)

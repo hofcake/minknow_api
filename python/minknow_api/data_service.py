@@ -432,26 +432,31 @@ class DataService(object):
                               [],
                               "minknow_api.data.DataService")
     def reset_channel_states(self, _message=None, _timeout=None, **kwargs):
-        """Call this to force re-evaluating the channel states. This will make sure the next
-        channel state evaluated will be 'unclassified_following_reset'. If the analyser is behind,
-        and older data will come for evaluation, it will result in changing the state to 'pending_manual_reset'.
-        So typically, after a resetting the channel states, the user would see in the bulk file
-        'unclassified_following_reset', 'pending_manual_reset', 'pending_manual_reset', until the relevant data
-        comes through to the analyser and it will start outputting the normal channel states again.
-        If the analyser is not behind, the user should ideally see just the 'unclassified_following_reset' state.
+        """Call this to force re-evaluating the channel states. This will make sure the next channel
+        state evaluated will be 'unclassified_following_reset'. If the analyser is behind, and older
+        data will come for evaluation, it will result in changing the state to
+        'pending_manual_reset'. So typically, after a resetting the channel states, the user would
+        see in the bulk file 'unclassified_following_reset', 'pending_manual_reset',
+        'pending_manual_reset', until the relevant data comes through to the analyser and it will
+        start outputting the normal channel states again. If the analyser is not behind, the user
+        should ideally see just the 'unclassified_following_reset' state.
 
-        This call is blocking - it will return from the rpc when it would have processed the
-        'unclassified_following_reset' in the analyser. If the rpc takes more than 1 minute
-        it will exit with the ABORTED status. This can happen if the analyser is more than 1 minute behind
-        for example (in practice it shouldn't be the case). If the RPC exits with the ABORT status, it means
-        the channels are to be reset in the future, but the analyser did not reach that point yet.
+        Note that this will not clear any locked channel states - you must call
+        unlock_channel_states() for that.
 
-        Only one of these can be executed at a given time. If multiple threads call this simultaneously,
-        it will execute the first request and it will exit with FAILED_PRECONDITION for the rest. If an RPC
-        exited with the ABORT status, another RPC can immediately be started. The failed RPC would have not
-        reset the channel states, and the user could try again. The second RPC will return as soon as the first
-        reset happens, so this will not be necessarily waiting for the second acquisition index to be
-        processed.
+        There is no guarantee that the reset will be visible in the channel states stream by the time
+        this call returns. If acquisition is paused at the time of the call, the channel states
+        streams may reflect the previous channel state (from before the reset) until acquisition is
+        resumed.
+
+        It is guaranteed that the data resulting from any device settings changes made after this
+        call returns will be processed after the reset. So, for example, if reset_channel_states() is
+        called and then device.set_channel_configuration() is called to change the mux of one of the
+        reset channels, the channel state for that channel will be reset before any data from the new
+        mux is evaluated.
+
+        Only one call to this RPC at once is permitted. If a second call is made while another call
+        is in progress, the second call will return a FAILED_PRECONDITION error.
 
         
 
@@ -502,14 +507,22 @@ class DataService(object):
         While the this RPC has the power of forcing a channel to any valid state other than 'unclassified',
         it is intended to be used with channel states that are designed for this functionality (i.e. that
         are never evaluated).
-        Has to be called while acquiring data, fails otherwise.
-        The forced channels are reset (reset = every channel back to being evaluated) every time a
-        new acquisition sequence is started.
 
-        NOTE:
-        Calls to lock_channel_states and unlock_channel_states cannot be done in the same time.
-        If any of these two is called while any of these is already running, the grpc will return
-        with an error.
+        This can only be called while acquiring data. The forced state does not persist between
+        acquisitions, but does persist across pauses.
+
+        There is no guarantee that the locked channel state will be visible in the channel states
+        stream by the time this call returns. However, if acquisition is paused at the time of the
+        call, the channel states streams should receiver an update with the new locked channel state.
+
+        It is guaranteed that the data resulting from any device settings changes made after this
+        call returns will be processed after the reset. So, for example, if reset_channel_states() is
+        called and then device.set_channel_configuration() is called to change the mux of one of the
+        reset channels, the channel state for that channel will be reset before any data from the new
+        mux is evaluated.
+
+        This RPC cannot be called concurrently with unlock_channel_states() or other
+        lock_channel_states() calls. Attempting to do so will return a FAILED_PRECONDITION error.
 
         
 
@@ -564,15 +577,24 @@ class DataService(object):
                               [],
                               "minknow_api.data.DataService")
     def unlock_channel_states(self, _message=None, _timeout=None, **kwargs):
-        """Re-activates channels that have been turned-off with force_channels_to_state.
-        Note that 'turning off' refers to channel states only, everything else is still applied on the channel
-        (e.g. mux changes, saturation, commands etc)
-        No action is taken if the channel is already active.
-        Has to be called while acquiring data, fails otherwise.
-        NOTE:
-        Calls to lock_channel_states and unlock_channel_states cannot be done in the same time.
-        If any of these two is called while any of these is already running, the grpc will return
-        with an error.
+        """Unlocks channels whose states have been locked by lock_channel_states.
+
+        If the state for the channel was not locked, this has no effect.
+
+        This can only be called while acquiring data.
+
+        There is no guarantee that the unlocking of the channel state will be visible in the channel
+        states stream by the time this call returns. If acquisition is paused at the time of the
+        call, the previous locked state may remain in place until acquisition resumes.
+
+        It is guaranteed that the data resulting from any device settings changes made after this
+        call returns will be processed after the unlock. So, for example, if unlock_channel_states()
+        is called and then device.set_channel_configuration() is called to change the mux of one of
+        the reset channels, the channel state for that channel will be unlocked before any data from
+        the new mux is evaluated.
+
+        This RPC cannot be called concurrently with lock_channel_states() or other
+        unlock_channel_states() calls. Attempting to do so will return a FAILED_PRECONDITION error.
 
         
 
